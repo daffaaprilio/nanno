@@ -1,19 +1,19 @@
 #!/bin/bash
 
-bam_dir="nanno/bam"
-sort_index_bam_dir="nanno/sort_bam"
+BAM_DIR="sample/bam"
+SORT_INDEX_BAM_DIR="sample/sort_bam"
 
-samtools="/home/daapr/samtools/bin/samtools"
-igvtools="/home/daapr/IGV_2.17.4/igvtools"
+SAMTOOLS="/home/daffa/bin/samtools" # "/home/daapr/samtools/bin/samtools"
+IGVTOOLS="/home/daffa/IGV_2.17.4/igvtools" # install later in matsu (when in lab)
 
-for file in "$bam_dir"/*.bam; do
+for file in "${BAM_DIR}"/*.bam; do
   filename=$(basename "$file" .bam)
-  "$samtools" sort -o "$sort_index_bam_dir"/${filename}_sorted.bam $file && "$samtools" index "$sort_index_bam_dir"/${filename}_sorted.bam
+  ${SAMTOOLS} sort -o ${SORT_INDEX_BAM_DIR}/${filename}_sorted.bam $file && ${SAMTOOLS} index ${SORT_INDEX_BAM_DIR}/${filename}_sorted.bam
 done
 
-for file in "$sort_index_bam_dir"/*.bam; do
+for file in ${SORT_INDEX_BAM_DIR}/*.bam; do
   filename=$(basename "$file" .bam)
   
-  "$igvtools" index "$file"
+  ${IGVTOOLS} index ${file}
 done
 
