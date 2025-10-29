@@ -9,15 +9,15 @@ inputs:
   fasta_check_dummy: File?
   gff_check_dummy: File?
   fasta: File
-  query_genes: File[]
+  # query_genes: File[]
 
 outputs:
   blastdb:
     type: Directory
     outputSource: mkdir/blastdb
-  blast_result:
-    type: File
-    outputSource: blastn/blast_result
+  # blast_result:
+  #   type: File
+  #   outputSource: blastn/blast_result
 
 steps:
   makeblastdb:
@@ -77,44 +77,44 @@ steps:
         blastdb:
           type: Directory
           outputBinding:
-            glob: $(inputs.blastdir)
+            glob: "$(inputs.blastdir)"
 
     in:
       blastfiles: makeblastdb/blastfiles
       blastdir:
         source: fasta
-        valueFrom: $(self.basename)
+        valueFrom: $(self.nameroot)
     out:
       [blastdb]
 
-  blastn:
-    run:
-      class: CommandLineTool
-      # hints:
-      #   DockerRequirement:
-      #     dockerPull: ncbi/amr:18.06
-    requirements:
-      - class: InitialWorkDirRequirement
-        listing:
-          - entry: $(inputs.fasta)
-            writable: False
-    # blastn -db -query -out -outfmt
-    baseCommand: blastn
-    inputs:
-      blastdb:
-        type: Directory
-        inputBinding:
-          prefix: -db
-      query:
-        type: File
-        inputBinding:
-          prefix: -query
-      outfmt:
-        type: int
-        inputBinding:
-          prefix: -outfmt
+  # blastn:
+  #   run:
+  #     class: CommandLineTool
+  #     # hints:
+  #     #   DockerRequirement:
+  #     #     dockerPull: ncbi/amr:18.06
+  #   requirements:
+  #     - class: InitialWorkDirRequirement
+  #       listing:
+  #         - entry: $(inputs.fasta)
+  #           writable: False
+  #   # blastn -db -query -out -outfmt
+  #   baseCommand: blastn
+  #   inputs:
+  #     blastdb:
+  #       type: Directory
+  #       inputBinding:
+  #         prefix: -db
+  #     query:
+  #       type: File
+  #       inputBinding:
+  #         prefix: -query
+  #     outfmt:
+  #       type: int
+  #       inputBinding:
+  #         prefix: -outfmt
 
-    outputs:
-      blast_result:
+  #   outputs:
+  #     blast_result:
 
 
