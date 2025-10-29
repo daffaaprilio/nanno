@@ -4,7 +4,7 @@ raw/
 blast/
 ref/
 query_genes/
-Nanoce_C018
+sample_gene_bed/
 
 # temporarily ignored files
 LPAT*_blast.txt
