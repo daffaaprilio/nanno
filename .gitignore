@@ -5,6 +5,8 @@ blast/
 ref/
 query_genes/
 sample_gene_bed/
+visualization_methylation_landscape/
+visualization_motif_analysis/
 
 # temporarily ignored files
 LPAT*_blast.txt
