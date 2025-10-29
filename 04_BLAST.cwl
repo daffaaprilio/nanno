@@ -4,20 +4,19 @@ class: Workflow
 
 requirements:
   - class: StepInputExpressionRequirement
+  - class: ScatterFeatureRequirement
 
 inputs:
-  fasta_check_dummy: File?
-  gff_check_dummy: File?
-  fasta: File
-  # query_genes: File[]
+  ref_genome: File
+  query_genes: File[]
 
 outputs:
   blastdb:
     type: Directory
     outputSource: mkdir/blastdb
-  # blast_result:
-  #   type: File
-  #   outputSource: blastn/blast_result
+  blast_results:
+    type: File[]
+    outputSource: blastn/blast_results
 
 steps:
   makeblastdb:
@@ -29,12 +28,12 @@ steps:
       requirements:
         - class: InitialWorkDirRequirement
           listing:
-            - entry: $(inputs.fasta)
+            - entry: $(inputs.ref_genome)
               writable: False
       #makeblastdb -in RefGenome -dbtype nucl
       baseCommand: makeblastdb
       inputs:
-        fasta:
+        ref_genome:
           type: File
           inputBinding:
             prefix: -in
@@ -43,6 +42,10 @@ steps:
           default: nucl
           inputBinding:
             prefix: -dbtype
+        out_prefix:
+          type: string
+          inputBinding:
+            prefix: -out
 
       outputs:
         blastfiles:
@@ -50,7 +53,10 @@ steps:
           outputBinding:
             glob: "*"
     in:
-      fasta: fasta
+      ref_genome: ref_genome
+      out_prefix:
+        source: ref_genome
+        valueFrom: $(self.nameroot)
     out:
       [blastfiles]
 
@@ -82,39 +88,49 @@ steps:
     in:
       blastfiles: makeblastdb/blastfiles
       blastdir:
-        source: fasta
+        source: ref_genome
         valueFrom: blast/blastdb/$(self.nameroot)
     out:
       [blastdb]
 
-  # blastn:
-  #   run:
-  #     class: CommandLineTool
-  #     # hints:
-  #     #   DockerRequirement:
-  #     #     dockerPull: ncbi/amr:18.06
-  #   requirements:
-  #     - class: InitialWorkDirRequirement
-  #       listing:
-  #         - entry: $(inputs.fasta)
-  #           writable: False
-  #   # blastn -db -query -out -outfmt
-  #   baseCommand: blastn
-  #   inputs:
-  #     blastdb:
-  #       type: Directory
-  #       inputBinding:
-  #         prefix: -db
-  #     query:
-  #       type: File
-  #       inputBinding:
-  #         prefix: -query
-  #     outfmt:
-  #       type: int
-  #       inputBinding:
-  #         prefix: -outfmt
-
-  #   outputs:
-  #     blast_result:
-
-
+  blastn:
+    run:
+      class: CommandLineTool
+      # hints:
+      #   DockerRequirement:
+      #     dockerPull: ncbi/amr:18.06
+      requirements:
+        - class: InitialWorkDirRequirement
+          listing:
+            - entry: $(inputs.blastdb)
+              writable: False
+      # blastn -db -query -out -outfmt
+      baseCommand: blastn
+      inputs:
+        blastdb:
+          type: Directory
+          inputBinding:
+            prefix: -db
+            valueFrom: blast/blastdb/$(inputs.ref_genome.nameroot)/$(inputs.ref_genome.nameroot)
+        query:
+          type: File
+          inputBinding:
+            prefix: -query
+        ref_genome:
+          type: File
+        outfmt:
+          type: int?
+          default: 6
+          inputBinding:
+            prefix: -outfmt
+      outputs:
+        blast_results:
+          type: stdout
+      stdout: $(inputs.query.nameroot)_blast.txt
+    scatter: query
+    in:
+      query: query_genes
+      blastdb: mkdir/blastdb
+      ref_genome: ref_genome
+    out:
+      [blast_results]

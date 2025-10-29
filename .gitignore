@@ -6,6 +6,9 @@ ref/
 query_genes/
 Nanoce_C018
 
+# temporarily ignored files
+LPAT*_blast.txt
+
 .editorconfig
 
 # Byte-compiled / optimized / DLL files

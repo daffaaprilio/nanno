@@ -1,0 +1,13 @@
+ref_genome:
+    class: File
+    location: ref/Nanoce_C018.fna
+
+query_genes:
+  - class: File
+    location: query_genes/LPAT1.fna
+  - class: File
+    location: query_genes/LPAT2.fna
+  - class: File
+    location: query_genes/LPAT3.fna
+  - class: File
+    location: query_genes/LPAT4.fna
