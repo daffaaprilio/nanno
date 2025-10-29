@@ -62,7 +62,7 @@ steps:
       arguments:
         - shellQuote: false
           valueFrom: >-
-            mkdir $(inputs.blastdir) && cp
+            mkdir -p $(inputs.blastdir) && cp
       inputs:
         blastfiles:
           type: File[]
@@ -77,13 +77,13 @@ steps:
         blastdb:
           type: Directory
           outputBinding:
-            glob: "$(inputs.blastdir)"
+            glob: "blast"
 
     in:
       blastfiles: makeblastdb/blastfiles
       blastdir:
         source: fasta
-        valueFrom: $(self.nameroot)
+        valueFrom: blast/blastdb/$(self.nameroot)
     out:
       [blastdb]
 
